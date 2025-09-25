@@ -32,7 +32,31 @@ namespace Msmart
 
             var parts = message.Split(",").Select(message => message.Trim()).ToArray();
 
-            
-        }
+            string type = "Unknown";
+            decimal amount = 0;
+            string category = "Unknown";
+            string date = "Unknown";
+
+            //Detect type
+            if (message.Contains("Paid", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("Sent", StringComparison.OrdinalIgnoreCase) ||
+                message.Contains("Buy", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "Expense";
+            }
+            else if (message.Contains("Recieved", StringComparison.OrdinalIgnoreCase) ||
+                    message.Contains("Deposit", StringComparison.OrdinalIgnoreCase)) 
+            {
+                type = "Income";
+            }
+
+            //Detect amount
+            foreach (var part in parts) 
+            {
+                if (decimal.TryParse(part, out amount))
+                    break;
+                
+            }
+        }  
     }
 }
