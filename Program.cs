@@ -29,6 +29,10 @@ namespace Msmart
 
             Console.Write("Paste here: ");
             string message = Console.ReadLine();
+
+            var parts = message.Split(",").Select(message => message.Trim()).ToArray();
+
+            
         }
     }
 }
