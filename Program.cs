@@ -1,11 +1,44 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Transactions;
 
 namespace Msmart
 {
     class Entry
     {
+        //Transaction class
+        public class Transaction 
+        {
+            public string Type { get; set; }
+            public decimal Amount { get; set; }
+            public decimal Balance { get; set; }
+            public DateTime Date { get; set; }
+            public string Category { get; set; }
+
+        }
+        public static void SaveTransactions(List<Transaction> transactions, string filePath) 
+        { 
+            string JsonString = JsonSerializer.Serialize(transactions, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+            });
+
+            File.WriteAllText(filePath, JsonString);    
+        }
+
+        public static List<Transaction> LoadTransactions(string filePath) 
+        {
+            if (!File.Exists(filePath))
+            {
+               return new List<Transaction>(); //Return empty list if file doesn't exist
+            }
+
+            string jsonString = File.ReadAllText(filePath); 
+            return JsonSerializer.Deserialize<List<Transaction>>(jsonString) ?? new List<Transaction>();
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("\n========= Welcome to M-Smart Budgeting App =========");
@@ -84,6 +117,7 @@ namespace Msmart
 
             }
 
+            SaveTransactions();
 
             // Output Transaction
             Console.WriteLine("\n✅ Parsed Transaction:");
@@ -91,6 +125,9 @@ namespace Msmart
             Console.WriteLine($"Amount: {amount}");
             Console.WriteLine($"Category: {category}");
             Console.WriteLine($"Date: {date}");
+
+            
         }
+
     }
 }
