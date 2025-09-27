@@ -269,6 +269,12 @@ namespace Msmart
 
         static void DeleteTransaction()
         {
+            if(transactions.Count == 0)
+            {
+                Console.WriteLine("\nNo Transactions available to delete.");
+                return;
+            }
+
             Console.WriteLine("\n-----Hey Hello you can now delete a transaction----------");
 
             //Print all reports
@@ -280,13 +286,31 @@ namespace Msmart
 
             }
 
-            if(!int.TryParse(Console.ReadLine(), out int choice) || choice > 1 || choice > transactions.Count)
+            if(!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > transactions.Count)
             {
                 Console.WriteLine("Invalid input...Returning to Menu");
                 return;
             }
 
+            var selected = transactions [choice - 1];
 
+            Console.WriteLine($"\n--- Deleting Transaction #{choice} ---");
+            Console.WriteLine($"{selected.Type}, {selected.Amount}, {selected.Date}, {selected.Category}");
+            Console.Write("Are you sure you want to delete this? (y/n): ");
+            string input = Console.ReadLine()?.ToLower();
+
+           if(input == "y")
+           {
+             selected.Type = transactions[choice - 1].Type.Remove(0);
+           }
+           else if(input == "n")
+           {
+             Console.WriteLine("Returning to the menu");
+           }
+           else if (String.IsNullOrWhiteSpace(input))
+           {
+             Console.WriteLine("Invalid input");
+           }
         }
     }
 }
