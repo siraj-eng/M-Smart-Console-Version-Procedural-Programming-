@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Xml.Serialization;
 
 namespace Msmart
 {
@@ -61,7 +60,8 @@ namespace Msmart
                 Console.WriteLine("2. View Transactions");
                 Console.WriteLine("3. Budget Alert and info");
                 Console.WriteLine("4. Edit Transaction");
-                Console.WriteLine("5. Exit");
+                Console.WriteLine("5. Delete Transaction");
+                Console.WriteLine("6. Exit");
                 Console.Write("Your choice: ");
 
                 string choice = Console.ReadLine();
@@ -75,12 +75,15 @@ namespace Msmart
                         ViewTransactions();
                         break;
                     case "3":
-                          BudgetAlert();
+                        BudgetAlert();
                         break;
                     case "4":
-                          EditTransaction();
+                        EditTransaction();
                         break;
                     case "5":
+                        DeleteTransaction();
+                        break;
+                    case "6":
                         Console.WriteLine("Goodbye!");
                         return;
                     default:
@@ -176,62 +179,61 @@ namespace Msmart
             }
         }
 
-        //BudgetAlert
+        // BudgetAlert
         static void BudgetAlert()
         {
             Console.WriteLine("Hello there !...Enter your interested budget amount");
             string input = Console.ReadLine();
             decimal budgetAmount;
 
-            // Try to convert input to decimal
             if (!decimal.TryParse(input, out budgetAmount) || budgetAmount <= 0)
             {
                 Console.WriteLine("❌ Not valid. Please enter a positive number.");
-                return; // stop the method here
+                return;
             }
 
-            //Calculate total expenses
             decimal totalExpenses = 0;
-            foreach (var t in transactions) 
+            foreach (var t in transactions)
             {
-                if (t.Type == "Expense") 
-                totalExpenses += t.Amount;
+                if (t.Type == "Expense")
+                    totalExpenses += t.Amount;
             }
 
-            Console.WriteLine($"\n Your Budget: {budgetAmount}");
+            Console.WriteLine($"\nYour Budget: {budgetAmount}");
             Console.WriteLine($"Total expenses: {totalExpenses}");
 
-            if(totalExpenses > budgetAmount)
+            if (totalExpenses > budgetAmount)
             {
-                Console.WriteLine("Alert! You have exceeded your budget");
+                Console.WriteLine("⚠️ Alert! You have exceeded your budget");
                 Console.WriteLine($"Overspent by {totalExpenses - budgetAmount}");
             }
             else
             {
-                Console.WriteLine("You are within Your Budget");
+                Console.WriteLine("✅ You are within Your Budget");
                 Console.WriteLine($"Remaining Budget: {budgetAmount - totalExpenses}");
             }
-        } 
+        }
 
+        // Edit Transaction
         static void EditTransaction()
         {
             Console.WriteLine("\nHello You can now edit the transactions made");
 
-            if (transactions.Count == 0) 
+            if (transactions.Count == 0)
             {
                 Console.WriteLine("\nNo Transaction available to edit.");
                 return;
             }
 
-            Console.WriteLine("\n---Transacations List---");
-            for (int i = 0; i < transactions.Count; i++) 
+            Console.WriteLine("\n--- Transactions List ---");
+            for (int i = 0; i < transactions.Count; i++)
             {
                 var t = transactions[i];
-                Console.WriteLine($"{i + 1}. {t.Type} | {t.Category} | {t.Amount} | {t.Date}");
+                Console.WriteLine($"{i + 1}. {t.Type} | {t.Category} | {t.Amount} | {t.Date.ToShortDateString()}");
             }
 
             Console.WriteLine("\nEnter the number of the transaction you want to edit: ");
-            if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > transactions.Count) 
+            if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > transactions.Count)
             {
                 Console.WriteLine("Invalid choice. Returning to menu!....");
                 return;
@@ -240,6 +242,7 @@ namespace Msmart
             var selected = transactions[choice - 1];
 
             Console.WriteLine($"\n--- Editing Transaction #{choice} ---");
+
             Console.WriteLine($"Current Type: {selected.Type}");
             Console.Write("Enter new Type (leave blank to keep): ");
             string updatedType = Console.ReadLine();
@@ -264,54 +267,55 @@ namespace Msmart
             if (DateTime.TryParse(dateInput, out var updatedDate))
                 selected.Date = updatedDate;
 
+            SaveTransactions(transactions, filePath);
+
             Console.WriteLine("\n✅ Transaction updated successfully!");
         }
 
+        // Delete Transaction
         static void DeleteTransaction()
         {
-            if(transactions.Count == 0)
+            if (transactions.Count == 0)
             {
                 Console.WriteLine("\nNo Transactions available to delete.");
                 return;
             }
 
-            Console.WriteLine("\n-----Hey Hello you can now delete a transaction----------");
-
-            //Print all reports
+            Console.WriteLine("\n--- Transactions List ---");
             for (int i = 0; i < transactions.Count; i++)
             {
-                var t = transactions[i]; //Current transaction
-
-                Console.WriteLine($"{i + 1}, {t.Type},{t.Amount},{t.Date},{t.Category}");
-
+                var t = transactions[i];
+                Console.WriteLine($"{i + 1}. {t.Type} | {t.Amount} | {t.Date.ToShortDateString()} | {t.Category}");
             }
 
-            if(!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > transactions.Count)
+            Console.WriteLine("\nEnter the number of the transaction you want to delete: ");
+            if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > transactions.Count)
             {
                 Console.WriteLine("Invalid input...Returning to Menu");
                 return;
             }
 
-            var selected = transactions [choice - 1];
+            var selected = transactions[choice - 1];
 
             Console.WriteLine($"\n--- Deleting Transaction #{choice} ---");
-            Console.WriteLine($"{selected.Type}, {selected.Amount}, {selected.Date}, {selected.Category}");
+            Console.WriteLine($"{selected.Type}, {selected.Amount}, {selected.Date.ToShortDateString()}, {selected.Category}");
             Console.Write("Are you sure you want to delete this? (y/n): ");
             string input = Console.ReadLine()?.ToLower();
 
-           if(input == "y")
-           {
-             transactions.RemoveAt(choice -1);
-                Console.WriteLine("Transaction Deleted successfully.");
-           }
-           else if(input == "n")
-           {
-             Console.WriteLine("Delete cancelled. Returning to the menu.!!!");
-           }
-           else if (String.IsNullOrWhiteSpace(input))
-           {
-             Console.WriteLine("Invalid input");
-           }
+            if (input == "y")
+            {
+                transactions.RemoveAt(choice - 1);
+                SaveTransactions(transactions, filePath);
+                Console.WriteLine("✅ Transaction Deleted successfully.");
+            }
+            else if (input == "n")
+            {
+                Console.WriteLine("Delete cancelled. Returning to the menu.");
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+            }
         }
     }
 }
