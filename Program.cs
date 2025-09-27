@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace Msmart
 {
@@ -264,6 +265,28 @@ namespace Msmart
                 selected.Date = updatedDate;
 
             Console.WriteLine("\n✅ Transaction updated successfully!");
+        }
+
+        static void DeleteTransaction()
+        {
+            Console.WriteLine("\n-----Hey Hello you can now delete a transaction----------");
+
+            //Print all reports
+            for (int i = 0; i < transactions.Count; i++)
+            {
+                var t = transactions[i]; //Current transaction
+
+                Console.WriteLine($"{i + 1}, {t.Type},{t.Amount},{t.Date},{t.Category}");
+
+            }
+
+            if(!int.TryParse(Console.ReadLine(), out int choice) || choice > 1 || choice > transactions.Count)
+            {
+                Console.WriteLine("Invalid input...Returning to Menu");
+                return;
+            }
+
+
         }
     }
 }
