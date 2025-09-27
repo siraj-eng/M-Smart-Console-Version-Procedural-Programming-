@@ -301,11 +301,12 @@ namespace Msmart
 
            if(input == "y")
            {
-             selected.Type = transactions[choice - 1].Type.Remove(0);
+             transactions.RemoveAt(choice -1);
+                Console.WriteLine("Transaction Deleted successfully.");
            }
            else if(input == "n")
            {
-             Console.WriteLine("Returning to the menu");
+             Console.WriteLine("Delete cancelled. Returning to the menu.!!!");
            }
            else if (String.IsNullOrWhiteSpace(input))
            {
