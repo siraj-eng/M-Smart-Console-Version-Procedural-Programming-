@@ -58,7 +58,8 @@ namespace Msmart
                 Console.WriteLine("\nMain Menu");
                 Console.WriteLine("1. Add a Transaction");
                 Console.WriteLine("2. View Transactions");
-                Console.WriteLine("3. Exit");
+                Console.WriteLine("3. Budget Alert and info");
+                Console.WriteLine("4. Exit");
                 Console.Write("Your choice: ");
 
                 string choice = Console.ReadLine();
@@ -72,7 +73,8 @@ namespace Msmart
                         ViewTransactions();
                         break;
                     case "3":
-
+                          BudgetAlert();
+                        break;
                     case "4":
                         Console.WriteLine("Goodbye!");
                         return;
@@ -173,14 +175,17 @@ namespace Msmart
         static void BudgetAlert()
         {
             Console.WriteLine("Hello there !...Enter your interested budget amount");
-            decimal budgetAmount = decimal.Parse(Console.ReadLine());
+            string input = Console.ReadLine();
+            decimal budgetAmount;
 
-            if(!decimal.TryParse(Console.ReadLine(), out budgetAmount) || budgetAmount < 0)
+            // Try to convert input to decimal
+            if (!decimal.TryParse(input, out budgetAmount) || budgetAmount <= 0)
             {
-                Console.WriteLine("Invalid budget amount. Please enter a positive number");
-                return;
+                Console.WriteLine("❌ Not valid. Please enter a positive number.");
+                return; // stop the method here
             }
 
+            //Calculate total expenses
             decimal totalExpenses = 0;
             foreach (var t in transactions) 
             {
@@ -202,5 +207,56 @@ namespace Msmart
                 Console.WriteLine($"Remaining Budget: {budgetAmount - totalExpenses}");
             }
         } 
+
+        static void EditTransaction()
+        {
+            Console.WriteLine("\nHello You can now edit the transactions made");
+
+            foreach( var t in transactions)
+            {
+                Console.WriteLine($"\n---Current Transaction---");
+                Console.WriteLine($"{t.Type}");
+                Console.WriteLine($"{t.Category}");
+                Console.WriteLine($"{t.Amount}");
+                Console.WriteLine($"{t.Date}");
+
+                //update logic
+                 string updatedType = Console.ReadLine();
+                 string updatedCategory = Console.ReadLine();
+                 decimal updatedAmount = Convert.ToDecimal( Console.ReadLine());
+                 var updatedDate = Convert.ToDateTime(Console.ReadLine());
+
+                //Assigning back updated values
+                if (String.IsNullOrWhiteSpace(updatedType))
+                {
+                    Console.WriteLine("Invalid type!");
+                    return;
+                }
+                else
+                {
+                    t.Type = updatedType;
+                }
+
+                if (decimal.TryParse(Console.ReadLine(), out  updatedAmount))
+                t.Amount = updatedAmount; 
+
+                if(DateTime.TryParse(Console.ReadLine(), out updatedDate))
+                    t.Date = updatedDate;
+
+                if (String.IsNullOrWhiteSpace(updatedCategory))
+                {
+                    Console.WriteLine("Invalid type!");
+                    return;
+                }
+                else
+                {
+                    t.Category = updatedCategory;
+                }
+     
+                //update message
+                Console.WriteLine("Transaction Updated successfully!!!");
+            }
+
+        }
     }
 }
