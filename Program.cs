@@ -59,7 +59,8 @@ namespace Msmart
                 Console.WriteLine("1. Add a Transaction");
                 Console.WriteLine("2. View Transactions");
                 Console.WriteLine("3. Budget Alert and info");
-                Console.WriteLine("4. Exit");
+                Console.WriteLine("4. Edit Transaction");
+                Console.WriteLine("5. Exit");
                 Console.Write("Your choice: ");
 
                 string choice = Console.ReadLine();
@@ -76,6 +77,9 @@ namespace Msmart
                           BudgetAlert();
                         break;
                     case "4":
+                          EditTransaction();
+                        break;
+                    case "5":
                         Console.WriteLine("Goodbye!");
                         return;
                     default:
@@ -212,51 +216,54 @@ namespace Msmart
         {
             Console.WriteLine("\nHello You can now edit the transactions made");
 
-            foreach( var t in transactions)
+            if (transactions.Count == 0) 
             {
-                Console.WriteLine($"\n---Current Transaction---");
-                Console.WriteLine($"{t.Type}");
-                Console.WriteLine($"{t.Category}");
-                Console.WriteLine($"{t.Amount}");
-                Console.WriteLine($"{t.Date}");
-
-                //update logic
-                 string updatedType = Console.ReadLine();
-                 string updatedCategory = Console.ReadLine();
-                 decimal updatedAmount = Convert.ToDecimal( Console.ReadLine());
-                 var updatedDate = Convert.ToDateTime(Console.ReadLine());
-
-                //Assigning back updated values
-                if (String.IsNullOrWhiteSpace(updatedType))
-                {
-                    Console.WriteLine("Invalid type!");
-                    return;
-                }
-                else
-                {
-                    t.Type = updatedType;
-                }
-
-                if (decimal.TryParse(Console.ReadLine(), out  updatedAmount))
-                t.Amount = updatedAmount; 
-
-                if(DateTime.TryParse(Console.ReadLine(), out updatedDate))
-                    t.Date = updatedDate;
-
-                if (String.IsNullOrWhiteSpace(updatedCategory))
-                {
-                    Console.WriteLine("Invalid type!");
-                    return;
-                }
-                else
-                {
-                    t.Category = updatedCategory;
-                }
-     
-                //update message
-                Console.WriteLine("Transaction Updated successfully!!!");
+                Console.WriteLine("\nNo Transaction available to edit.");
+                return;
             }
 
+            Console.WriteLine("\n---Transacations List---");
+            for (int i = 0; i < transactions.Count; i++) 
+            {
+                var t = transactions[i];
+                Console.WriteLine($"{i + 1}. {t.Type} | {t.Category} | {t.Amount} | {t.Date}");
+            }
+
+            Console.WriteLine("\nEnter the number of the transaction you want to edit: ");
+            if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > transactions.Count) 
+            {
+                Console.WriteLine("Invalid choice. Returning to menu!....");
+                return;
+            }
+
+            var selected = transactions[choice - 1];
+
+            Console.WriteLine($"\n--- Editing Transaction #{choice} ---");
+            Console.WriteLine($"Current Type: {selected.Type}");
+            Console.Write("Enter new Type (leave blank to keep): ");
+            string updatedType = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(updatedType))
+                selected.Type = updatedType;
+
+            Console.WriteLine($"Current Category: {selected.Category}");
+            Console.Write("Enter new Category (leave blank to keep): ");
+            string updatedCategory = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(updatedCategory))
+                selected.Category = updatedCategory;
+
+            Console.WriteLine($"Current Amount: {selected.Amount}");
+            Console.Write("Enter new Amount (leave blank to keep): ");
+            string amountInput = Console.ReadLine();
+            if (decimal.TryParse(amountInput, out var updatedAmount))
+                selected.Amount = updatedAmount;
+
+            Console.WriteLine($"Current Date: {selected.Date}");
+            Console.Write("Enter new Date (leave blank to keep): ");
+            string dateInput = Console.ReadLine();
+            if (DateTime.TryParse(dateInput, out var updatedDate))
+                selected.Date = updatedDate;
+
+            Console.WriteLine("\n✅ Transaction updated successfully!");
         }
     }
 }
