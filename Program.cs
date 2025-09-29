@@ -62,7 +62,8 @@ namespace Msmart
                 Console.WriteLine("4. Edit Transaction");
                 Console.WriteLine("5. Delete Transaction");
                 Console.WriteLine("6. Search Transaction");
-                Console.WriteLine("7. Exit");
+                Console.WriteLine("7: Filter Transaction");
+                Console.WriteLine("8. Exit");
                 Console.Write("Your choice: ");
 
                 string choice = Console.ReadLine();
@@ -88,6 +89,9 @@ namespace Msmart
                         SearchTransaction();
                         break;
                     case "7":
+                        FilterTransaction();
+                        break;
+                    case "8":
                         Console.WriteLine("Goodbye!");
                         return;
                     default:
