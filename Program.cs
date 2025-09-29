@@ -409,18 +409,92 @@ namespace Msmart
             }
         }
 
-        //Report summery
-        static void reportSummery()
-        {
-            Console.WriteLine("\n-----Report Summmery---------");
+        //Summery Report
+        // Requires: using System; using System.Linq; using System.Collections.Generic;
 
-            if (transactions.Count == 0)
+        static void ReportSummary()
+        {
+            Console.WriteLine("\n----- Report Summary -----");
+
+            if (transactions == null || transactions.Count == 0)
             {
-                Console.WriteLine("No report Transaction to display check Transactions settings");
+                Console.WriteLine("No transactions available. Please add some first.");
                 return;
             }
 
-            
+            // 1) Print all transactions (table-like)
+            Console.WriteLine("\n--- All Transactions ---");
+            Console.WriteLine($"{"#",3} {"Type",-10} {"Category",-20} {"Amount",12} {"Date",12}");
+            for (int i = 0; i < transactions.Count; i++)
+            {
+                var t = transactions[i];
+                var type = string.IsNullOrWhiteSpace(t.Type) ? "Unknown" : t.Type.Trim();
+                var category = string.IsNullOrWhiteSpace(t.Category) ? "Uncategorized" : t.Category.Trim();
+                Console.WriteLine($"{i + 1,3} {type,-10} {category,-20} {t.Amount,12:N2} {t.Date:yyyy-MM-dd}");
+            }
+
+            // 2) Basic stats
+            int totalTransactions = transactions.Count;
+            decimal totalAmount = transactions.Sum(t => t.Amount);          // net (depends on how you store signs)
+            decimal avgAmount = transactions.Average(t => t.Amount);
+            DateTime minDate = transactions.Min(t => t.Date);
+            DateTime maxDate = transactions.Max(t => t.Date);
+            var largestTx = transactions.OrderByDescending(t => t.Amount).First();
+            var smallestTx = transactions.OrderBy(t => t.Amount).First();
+
+            Console.WriteLine("\n--- Totals & Overview ---");
+            Console.WriteLine($"Total transactions: {totalTransactions}");
+            Console.WriteLine($"Total (net) amount: {totalAmount:N2}");
+            Console.WriteLine($"Average transaction amount: {avgAmount:N2}");
+            Console.WriteLine($"Date range: {minDate:yyyy-MM-dd} → {maxDate:yyyy-MM-dd}");
+            Console.WriteLine($"Largest tx: {largestTx.Type} {largestTx.Amount:N2} on {largestTx.Date:yyyy-MM-dd} ({largestTx.Category})");
+            Console.WriteLine($"Smallest tx: {smallestTx.Type} {smallestTx.Amount:N2} on {smallestTx.Date:yyyy-MM-dd} ({smallestTx.Category})");
+
+            // 3) Totals by Type (case-insensitive grouping)
+            var byType = transactions
+                .GroupBy(t => (t.Type ?? "Unknown").Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g => new { Type = g.Key, Count = g.Count(), Total = g.Sum(x => x.Amount) })
+                .OrderByDescending(x => x.Total)
+                .ToList();
+
+            Console.WriteLine("\n--- Totals by Type ---");
+            foreach (var x in byType)
+            {
+                Console.WriteLine($"{x.Type}: Count = {x.Count}, Total = {x.Total:N2}");
+            }
+
+            // 4) Totals by Category (show top 10)
+            var byCategory = transactions
+                .GroupBy(t => (t.Category ?? "Uncategorized").Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g => new { Category = g.Key, Count = g.Count(), Total = g.Sum(x => x.Amount) })
+                .OrderByDescending(x => x.Total)
+                .ToList();
+
+            Console.WriteLine("\n--- Totals by Category (top 10) ---");
+            foreach (var c in byCategory.Take(10))
+            {
+                Console.WriteLine($"{c.Category}: Count = {c.Count}, Total = {c.Total:N2}");
+            }
+
+            // 5) Income vs Expense heuristic (you can edit the keywords)
+            var incomeKeywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    { "income", "credit", "salary", "deposit", "sale", "in" };
+
+            decimal totalIncomeByType = transactions
+                .Where(t => incomeKeywords.Contains((t.Type ?? "").Trim()))
+                .Sum(t => t.Amount);
+
+            decimal totalExpenseByType = transactions
+                .Where(t => !incomeKeywords.Contains((t.Type ?? "").Trim()))
+                .Sum(t => t.Amount);
+
+            Console.WriteLine("\n--- Income vs Expense (by Type heuristic) ---");
+            Console.WriteLine($"Total Income (by type): {totalIncomeByType:N2}");
+            Console.WriteLine($"Total Expense (by type): {totalExpenseByType:N2}");
+            Console.WriteLine($"Net (sum of all amounts): {totalAmount:N2}");
+
+            // Tip
+            Console.WriteLine("\nTip: If you store expenses as negative amounts, the net sum (Total) already represents profit/loss.");
         }
     }
 }
