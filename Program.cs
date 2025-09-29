@@ -61,7 +61,8 @@ namespace Msmart
                 Console.WriteLine("3. Budget Alert and info");
                 Console.WriteLine("4. Edit Transaction");
                 Console.WriteLine("5. Delete Transaction");
-                Console.WriteLine("6. Exit");
+                Console.WriteLine("6. Search Transaction");
+                Console.WriteLine("7. Exit");
                 Console.Write("Your choice: ");
 
                 string choice = Console.ReadLine();
@@ -84,6 +85,9 @@ namespace Msmart
                         DeleteTransaction();
                         break;
                     case "6":
+                        SearchTransaction();
+                        break;
+                    case "7":
                         Console.WriteLine("Goodbye!");
                         return;
                     default:
@@ -318,6 +322,7 @@ namespace Msmart
             }
         }
 
+        //Search Transactions
         static void SearchTransaction()
         {
             //safely returning method early
@@ -337,16 +342,66 @@ namespace Msmart
                 t.Date.ToString("yyyy-mm-dd").Contains(keyword)
                 ).ToList();
 
-            if(transactions.Count == 0)
-            {
-                Console.WriteLine("\n No transaction Available");
-                return;
-            }
 
             Console.WriteLine("\n-----Search Results--------");
             foreach (var t in results) 
             {
                 Console.WriteLine($"{t.Type} || {t.Amount} || {t.Category} ({t.Date.ToShortTimeString()})");
+            }
+        }
+
+        //Filter Transaction
+        static void FilterTransaction()
+        {
+            if (transactions.Count == 0) 
+            {
+                Console.WriteLine("\n No transactions available here!!");
+                return;
+            }
+
+            Console.WriteLine("\nFilter by:");
+            Console.WriteLine("1. Type");
+            Console.WriteLine("2.Category");
+            Console.WriteLine("3. Date (yyyy-mm-dd)");
+            Console.WriteLine("4.Amount");
+
+            Console.Write("\nChoose an option (1-4): ");
+            string option = Console.ReadLine();
+
+            Console.Write("\nEnter a value to filter by: ");
+            string value = Console.ReadLine()?.Trim().ToLower();
+
+            IEnumerable<Transaction> results = Enumerable.Empty<Transaction>();
+
+            switch (option) 
+            {
+                case "1":
+                    results = transactions.Where(t => t.Type.ToLower().Contains(value));
+                    break;
+                case "2":
+                    results = transactions.Where(t => t.Category.ToLower().Contains(value));
+                    break;
+                case "3":
+                    results = transactions.Where(t => t.Date.ToString("yyyy-mm-dd").Contains(value));
+                    break;
+                case "4":
+                    results = transactions.Where(t => t.Amount.ToString().ToLower().Contains(value));
+                    break;
+                default:
+                    Console.WriteLine("Invalid option.");
+                    return;
+            }
+
+            if (!results.Any())
+            {
+                Console.WriteLine("No matching transactions found");
+                return;
+            }
+
+            Console.WriteLine("\n----Filtered Transactions-----");
+            foreach(var t in results)
+            {
+                Console.WriteLine($"{t.Type} | {t.Amount} | {t.Date.ToShortDateString()} | {t.Category}");
             }
         }
     }
