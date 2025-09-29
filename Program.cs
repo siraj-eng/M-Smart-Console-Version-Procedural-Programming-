@@ -500,6 +500,7 @@ namespace Msmart
             Console.WriteLine("\nTip: If you store expenses as negative amounts, the net sum (Total) already represents profit/loss.");
         }
 
+        //Export Transaction
         static void ExportTransactionsToCsv(string filepath)
         {
             if(transactions.Count == 0)
@@ -521,6 +522,42 @@ namespace Msmart
 
             File.WriteAllText(filepath, sb.ToString());
             Console.WriteLine($"\nTransactions successfully exported to {filePath}");
+        }
+
+        //Import Transaction
+        static void ImportTransactionsFromCsv(string filepath)
+        {
+            if (!File.Exists(filepath))
+            {
+                Console.WriteLine("Csv file not found");
+                return;
+            }
+
+            var lines = File.ReadAllLines(filepath);
+
+            transactions.Clear(); //Clear current list before import
+
+            for (int i = 1; i < lines.Length; i++) //skip header
+            {
+                var parts = lines[i].Split(',');
+
+                if(parts.Length != 4) //skipped malformed rows
+                    continue;
+
+                string type = parts[0];
+                string category = parts[1];
+                decimal amount = decimal.Parse(parts[2]);
+                DateTime date = DateTime.Parse(parts[3]);
+
+                transactions.Add(new Transaction
+                {
+                    Type = type,
+                    Category = category,
+                    Amount = amount,
+                    Date = date
+                });
+            }
+            Console.WriteLine($"\nImported {transactions.Count} transactions from {filePath}");
         }
     }
 }
