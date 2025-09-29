@@ -327,24 +327,27 @@ namespace Msmart
                 return;
             }
 
-            Console.WriteLine("\n------List of the Transactions-------");
-            for (int i = 0; i < transactions.Count; i++)
-            { 
-                var t = transactions[i];
+            Console.Write("\nEnter the Keyword eg(Type, Category, yyyy-mm-dd)");
+            string keyword = Console.ReadLine()?.Trim().ToLower();
 
-                Console.WriteLine($"{i + 1} | {t.Type} | {t.Amount} | {t.Date.ToShortDateString} | {t.Category}");
-            }
+            var results = transactions
+                .Where(t =>
+                t.Type.ToLower().Contains(keyword)||
+                t.Category.ToLower().Contains(keyword) ||
+                t.Date.ToString("yyyy-mm-dd").Contains(keyword)
+                ).ToList();
 
-            Console.WriteLine("\nEnter the number of transaction you are searching for");
-            if(!int.TryParse(Console.ReadLine(),out int choice) || choice < 0 || choice > transactions.Count)
+            if(transactions.Count == 0)
             {
-                Console.WriteLine("Invalid Input....Returning to menu");
+                Console.WriteLine("\n No transaction Available");
                 return;
             }
 
-            var selected = transactions[choice - 1];
-            Console.WriteLine($"\n---  Transaction #{choice} ---");
-            Console.WriteLine($"{selected.Type}, {selected.Amount}, {selected.Date.ToShortDateString()}, {selected.Category}");
+            Console.WriteLine("\n-----Search Results--------");
+            foreach (var t in results) 
+            {
+                Console.WriteLine($"{t.Type} || {t.Amount} || {t.Category} ({t.Date.ToShortTimeString()})");
+            }
         }
     }
 }
