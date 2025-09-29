@@ -317,5 +317,34 @@ namespace Msmart
                 Console.WriteLine("Invalid input.");
             }
         }
+
+        static void SearchTransaction()
+        {
+            //safely returning method early
+            if(transactions.Count == 0)
+            {
+                Console.WriteLine("\nNo transaction available here");
+                return;
+            }
+
+            Console.WriteLine("\n------List of the Transactions-------");
+            for (int i = 0; i < transactions.Count; i++)
+            { 
+                var t = transactions[i];
+
+                Console.WriteLine($"{i + 1} | {t.Type} | {t.Amount} | {t.Date.ToShortDateString} | {t.Category}");
+            }
+
+            Console.WriteLine("\nEnter the number of transaction you are searching for");
+            if(!int.TryParse(Console.ReadLine(),out int choice) || choice < 0 || choice > transactions.Count)
+            {
+                Console.WriteLine("Invalid Input....Returning to menu");
+                return;
+            }
+
+            var selected = transactions[choice - 1];
+            Console.WriteLine($"\n---  Transaction #{choice} ---");
+            Console.WriteLine($"{selected.Type}, {selected.Amount}, {selected.Date.ToShortDateString()}, {selected.Category}");
+        }
     }
 }
