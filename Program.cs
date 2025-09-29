@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -497,6 +498,29 @@ namespace Msmart
 
             // Tip
             Console.WriteLine("\nTip: If you store expenses as negative amounts, the net sum (Total) already represents profit/loss.");
+        }
+
+        static void ExportTransactionsToCsv(string filepath)
+        {
+            if(transactions.Count == 0)
+            {
+                Console.WriteLine("No Transaction to export.");
+                return;
+            }
+
+            var sb = new StringBuilder(); //starts with an empty string buffer that you can build up piece by piece
+
+            //header row
+            sb.AppendLine("Type, Category, Amount, Date");
+
+            //Data Rows
+            foreach (var t in transactions)
+            {
+                sb.AppendLine($"{t.Type},{t.Category},{t.Amount},{t.Date:yyyy-MM-dd}");
+            }
+
+            File.WriteAllText(filepath, sb.ToString());
+            Console.WriteLine($"\nTransactions successfully exported to {filePath}");
         }
     }
 }
