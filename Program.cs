@@ -63,9 +63,11 @@ namespace Msmart
                 Console.WriteLine("4. Edit Transaction");
                 Console.WriteLine("5. Delete Transaction");
                 Console.WriteLine("6. Search Transaction");
-                Console.WriteLine("7: Filter Transaction");
-                Console.WriteLine("8: Report Summery");
-                Console.WriteLine("9.Exit");
+                Console.WriteLine("7. Filter Transaction");
+                Console.WriteLine("8. Report Summary");
+                Console.WriteLine("9. Export Transactions to CSV");
+                Console.WriteLine("10. Import Transactions from CSV");
+                Console.WriteLine("11. Exit");
                 Console.Write("Your choice: ");
 
                 string choice = Console.ReadLine();
@@ -97,6 +99,12 @@ namespace Msmart
                         ReportSummary();
                         break;
                     case "9":
+                        ExportTransactionsToCsv("transactions.csv");
+                        break;
+                    case "10":
+                        ImportTransactionsFromCsv("transactions.csv");
+                        break;
+                    case "11":
                         Console.WriteLine("Goodbye!");
                         return;
                     default:
