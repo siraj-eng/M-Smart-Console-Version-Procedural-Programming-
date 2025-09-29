@@ -408,5 +408,19 @@ namespace Msmart
                 Console.WriteLine($"{t.Type} | {t.Amount} | {t.Date.ToShortDateString()} | {t.Category}");
             }
         }
+
+        //Report summery
+        static void reportSummery()
+        {
+            Console.WriteLine("\n-----Report Summmery---------");
+
+            if (transactions.Count == 0)
+            {
+                Console.WriteLine("No report Transaction to display check Transactions settings");
+                return;
+            }
+
+            
+        }
     }
 }
